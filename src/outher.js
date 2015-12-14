@@ -1,1 +1,0 @@
-module.exports = 'exported stuff is cool'
