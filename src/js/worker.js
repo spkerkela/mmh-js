@@ -1,9 +1,10 @@
 const B = require('baconjs')
 
 const countStream = B.repeatedly(1000, [1, 2, 3, 4, 5])
-
+let i = 0
 countStream.onValue((v) => {
-	postMessage({ count: v })
+	i++
+	postMessage({ count: i })
 })
 
 const messageStream = B.fromBinder(sink => {
