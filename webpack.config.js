@@ -1,6 +1,6 @@
 /* global __dirname */
 module.exports = {
-	entry: "./src/entry.js",
+	entry: "./src/js/entry.js",
 	target: "web",
 	output: {
 		path: __dirname + "/out",
