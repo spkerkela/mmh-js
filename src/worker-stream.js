@@ -10,7 +10,7 @@ const workerStream = B.fromBinder(sink => {
 	myWorker.onerror = (e) => {
 		sink(new B.Error(e))
 	}
-}).log()
+})
 
 const dispatch = (message) => {
 	myWorker.postMessage(message)
