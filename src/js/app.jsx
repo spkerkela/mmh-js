@@ -41,6 +41,7 @@ const MyHeader = React.createClass({
 	},
 	render() {
 		const {header} = this.state
+        console.log('header is:', header)
 		return <h2>{header}</h2>
 	}
 })
