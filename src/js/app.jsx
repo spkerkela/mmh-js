@@ -75,7 +75,7 @@ const MyHeader = React.createClass({
 const MyInput = React.createClass({
 	myChange(e) {
 		const {value} = e.target
-		dispatch({action: 'headerSet', value})	
+		dispatch({action: 'searchMovie', value})	
 	},
 	render() {
 		return <input type={'text'} onChange={this.myChange}></input>

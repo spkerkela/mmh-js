@@ -17,9 +17,9 @@ const messageStream = B.fromBinder(sink => {
     }
 })
 
-messageStream
+const movieSearch = messageStream
     .map('.data')
-    .filter(e => e.action === 'headerSet')
+    .filter(e => e.action === 'searchMovie')
     .throttle(200)
     .flatMap(data => {
         return B.fromPromise(fetch('https://omdbapi.com/?t=' + data.value,
@@ -28,7 +28,5 @@ messageStream
                 return response.json()
             }))
     })
-    .onValue(movieData => {
-        console.log(movieData)
-        postMessage({ movie: movieData})
-    })
+
+movieSearch.onValue(movieData => postMessage({ movie: movieData }))
