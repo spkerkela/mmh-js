@@ -22,28 +22,7 @@ const MovieInfo = React.createClass({
     }
 })
 
-const MyComponent = React.createClass({
-	componentDidMount() {
-		const {countStream} = this.props
-		
-		const stateUpdate = B.combineTemplate({
-			count: countStream.map('.count')
-		})
-		
-		stateUpdate.onValue(newState => {
-			this.setState(newState)
-		})
-	},
-	getInitialState() {
-		return {count: 1}
-	},
-	render() {
-		const {count} = this.state
-		return <h2>Mjaijai {count}</h2>
-	}
-})
-
-const MyHeader = React.createClass({
+const MovieContent = React.createClass({
 	componentDidMount() {
 		const {headerStream} = this.props
 		
@@ -84,10 +63,9 @@ const MyInput = React.createClass({
 
 ReactDOM.render(
 	<div>
-		<h1>Hello World</h1>
-		<MyHeader headerStream={subscribe('.movie')}/>
-		<MyInput />
-		<MyComponent countStream={subscribe('.count')}/>
+        <h3>Search for a movie</h3>
+        <MyInput />
+		<MovieContent headerStream={subscribe('.movie')}/>
 	</div>,
 	document.getElementById('app')
 )
