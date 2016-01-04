@@ -1,3 +1,4 @@
+/* global fetch */
 const B = require('baconjs')
 
 const countStream = B.repeatedly(1000, [1, 2, 3, 4, 5])
@@ -19,6 +20,11 @@ const messageStream = B.fromBinder(sink => {
 messageStream
 	.map('.data')
 	.filter(e => e.action === 'headerSet')
+	.flatMap(data => {
+		return B.fromPromise(fetch('https://omdbapi.com/?t='+data.value, {mode: 'no-cors', method:'GET'}).then(response => {
+			return response.json()
+		}))
+	})
 	.onValue(data => {
 		console.log(data)
 		postMessage({ header: data.value })
