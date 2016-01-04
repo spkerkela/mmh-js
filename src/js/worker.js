@@ -28,7 +28,7 @@ messageStream
                 return response.json()
             }))
     })
-    .onValue(data => {
-        console.log(data)
-        postMessage({ header: data.value })
+    .onValue(movieData => {
+        console.log(movieData)
+        postMessage({ movie: movieData})
     })

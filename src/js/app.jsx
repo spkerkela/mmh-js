@@ -3,6 +3,25 @@ const ReactDOM = require('react-dom')
 const B = require('baconjs')
 const {subscribe, dispatch} = require('./worker-stream')
 
+const MovieInfo = React.createClass({
+    render() {
+        const {movie} = this.props
+        const img = movie.Poster !== 'N/A' ? <img src={movie.Poster} /> : null
+        return (
+            <div>
+                <p>{movie.Plot}</p>
+                <div>{movie.Actors}</div>
+                <div>{movie.Runtime}</div>
+                <div>{movie.Writer}</div>
+                <div>{movie.Year}</div>
+                <div>{movie.Rated}</div>
+                <div>{movie.Awards}</div>
+                {img}
+            </div>
+        )
+    }
+})
+
 const MyComponent = React.createClass({
 	componentDidMount() {
 		const {countStream} = this.props
@@ -29,7 +48,7 @@ const MyHeader = React.createClass({
 		const {headerStream} = this.props
 		
 		const stateUpdate = B.combineTemplate({
-			header: headerStream.map('.header')
+			movie: headerStream.map('.movie')
 		})
 		
 		stateUpdate.onValue(newState => {
@@ -37,12 +56,19 @@ const MyHeader = React.createClass({
 		})
 	},
 	getInitialState() {
-		return {header: ''}
+		return {movie: {
+            Title: 'No movie searched yet'
+        }}
 	},
 	render() {
-		const {header} = this.state
-        console.log('header is:', header)
-		return <h2>{header}</h2>
+		const {movie} = this.state
+        const {Title} = movie
+		return (
+            <div>
+                <h2>{Title}</h2>
+                <MovieInfo movie={movie} />
+            </div>
+        )
 	}
 })
 
@@ -59,7 +85,7 @@ const MyInput = React.createClass({
 ReactDOM.render(
 	<div>
 		<h1>Hello World</h1>
-		<MyHeader headerStream={subscribe('.header')}/>
+		<MyHeader headerStream={subscribe('.movie')}/>
 		<MyInput />
 		<MyComponent countStream={subscribe('.count')}/>
 	</div>,
