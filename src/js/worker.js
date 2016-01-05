@@ -21,10 +21,26 @@ const messageStream = B.fromBinder(sink => {
     onerror = (e) => {
         sink(new B.Error(e))
     }
-})
+}).map('.data')
+
+function arrayFromString(text) {
+    return text.split(',').map(t => t.trim())
+}
+
+function documentFromMovie(movie) {
+    movie._id = movie.imdbID
+    const pairs = R.toPairs(movie)
+    const movieDocument = R.reduce((movieAcc, [key, value]) => {
+        if (value === 'N/A') {
+            return movieAcc
+        }
+        const val = R.contains(key, ['Country', 'Director', 'Actors', 'Genre', 'Language', 'Writer']) ? arrayFromString(value) : value
+        return R.assoc(key.toLowerCase(), val, movieAcc)
+    }, {}, pairs)
+    return R.dissoc('response', movieDocument)
+}
 
 const movieSearch = messageStream
-    .map('.data')
     .filter(e => e.action === 'searchMovie')
     .throttle(200)
     .flatMap(data => {
@@ -35,10 +51,17 @@ const movieSearch = messageStream
             }))
     })
     .filter(resp => resp.Response !== 'False')
-    .map(movie => {
-        movie._id = movie.imdbID
-        return movie
-    }).log()
+    .map(documentFromMovie).log()
+
+const dbSearch = messageStream
+    .filter(e => e.action === 'searchDB')
+    .map('.value')
+    .flatMap(id => {
+        return B.fromNodeCallback(localDB.get.bind(localDB), id)
+    })
+    .onValue(movie => {
+        postMessage({movie:movie})
+    })
 
 const dbUpdates = B.fromEvent(localDB.changes({
     since: 'now',
@@ -54,13 +77,24 @@ dbUpdates
         })
     })
     .map('.rows')
+    .map(moviesList => moviesList.map(m => m.doc))
     .onValue(movies => {
-        postMessage({movies: movies})
+        postMessage({ movies: movies })
     })
 
-
-/*
-B.fromNodeCallback(localDB.allDocs.bind(this), {
+B.fromNodeCallback(localDB.allDocs.bind(localDB), {
     include_docs: true,
     descending: true
-}).log()*/
+}).map('.rows')
+    .map(moviesList => moviesList.map(m => m.doc))
+    .onValue(movies => {
+        postMessage({ movies: movies })
+    })
+
+function sync() {
+    const opts = { live: true }
+    localDB.replicate.to(remoteCouch, opts)
+    localDB.replicate.from(remoteCouch, opts)
+}
+
+sync()
