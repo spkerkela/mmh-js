@@ -8,9 +8,7 @@ const remoteCouch = 'http://localhost:5984/movies'
 
 function insertMovie(movie) {
     localDB.put(movie, (err, result) => {
-        if (!err) {
-            postMessage({ movie: movie })
-        }
+        postMessage({ movie: movie })
     })
 }
 
@@ -51,7 +49,7 @@ const movieSearch = messageStream
             }))
     })
     .filter(resp => resp.Response !== 'False')
-    .map(documentFromMovie).log()
+    .map(documentFromMovie)
 
 const dbSearch = messageStream
     .filter(e => e.action === 'searchDB')
@@ -60,7 +58,20 @@ const dbSearch = messageStream
         return B.fromNodeCallback(localDB.get.bind(localDB), id)
     })
     .onValue(movie => {
-        postMessage({movie:movie})
+        postMessage({ movie })
+    })
+
+const movieSave = messageStream
+    .filter(e => e.action === 'saveMovie')
+    .map('.value')
+    .flatMap(movie => {
+        return B.fromPromise(localDB.put(movie).then(response => {
+            movie._rev = response.rev
+            return movie
+        }))
+    })
+    .onValue(movie => {
+        postMessage({ movie })
     })
 
 const dbUpdates = B.fromEvent(localDB.changes({
@@ -69,6 +80,7 @@ const dbUpdates = B.fromEvent(localDB.changes({
 }), 'change')
 
 movieSearch.onValue(movie => insertMovie(movie))
+
 dbUpdates
     .flatMap(changes => {
         return B.fromNodeCallback(localDB.allDocs.bind(localDB), {
@@ -79,16 +91,14 @@ dbUpdates
     .map('.rows')
     .map(moviesList => moviesList.map(m => m.doc))
     .onValue(movies => {
-        postMessage({ movies: movies })
+        postMessage({ movies })
     })
 
-B.fromNodeCallback(localDB.allDocs.bind(localDB), {
-    include_docs: true,
-    descending: true
-}).map('.rows')
+B.fromNodeCallback(localDB.allDocs.bind(localDB), { include_docs: true, descending: true })
+    .map('.rows')
     .map(moviesList => moviesList.map(m => m.doc))
     .onValue(movies => {
-        postMessage({ movies: movies })
+        postMessage({ movies })
     })
 
 function sync() {

@@ -4,6 +4,37 @@ const B = require('baconjs')
 const {subscribe, dispatch} = require('./worker-stream')
 const R = require('ramda')
 
+const BodyCountInput = React.createClass({
+    getInitialState() {
+        const bodyCount = this.props.movie.bodyCount || 0
+        
+        return {
+            bodyCount: 0
+        }
+    },
+    updateBodyCount(e) {
+        const bodyCount = e.target.value
+        
+        this.setState({bodyCount: parseInt(bodyCount) || 0})
+    },
+    saveMovie() {
+        const {movie} = this.props
+        const {bodyCount} = this.state
+        console.log('saving movie')
+        movie.bodyCount = bodyCount
+        dispatch({action: 'saveMovie', value: movie})
+    },
+    render() {
+        const {bodyCount} = this.state
+        return (
+            <div>
+                <input type={'number'} step={1} min={0} value={bodyCount} onChange={this.updateBodyCount}/>
+                <input type={'button'} value={'Save'} onClick={this.saveMovie}/>
+            </div>
+        )
+    }
+})
+
 const MovieListing = React.createClass({
     movieClicked(movie) {
         dispatch({action: 'searchDB', value: movie._id})
@@ -27,11 +58,11 @@ const MovieListing = React.createClass({
         const {dbMovies} = this.state
         
         const movieElems = dbMovies.map((movie,i) => {
-            return <li onClick={() => this.movieClicked(movie)} key={i}>{movie.title||movie.Title}</li>
+            return <li className={'clickable'} onClick={() => this.movieClicked(movie)} key={i}>{movie.title||movie.Title}</li>
         })
         
         return (
-            <div>
+            <div className={'pane right'}>
             <h3>Movies in Database</h3>
             <ul>
                 {movieElems}
@@ -58,7 +89,8 @@ const MovieInfo = React.createClass({
         const {movie} = this.props
         const img = movie.poster ? <img src={movie.poster} /> : null
         return (
-            <div>
+            <div  className={'pane'}>
+                <h2>{movie.title}</h2>
                 <p>{movie.plot}</p>
                 <MovieAttribute attr={movie.actors} />
                 <MovieAttribute attr={movie.runtime} />
@@ -66,6 +98,7 @@ const MovieInfo = React.createClass({
                 <MovieAttribute attr={movie.year} />
                 <MovieAttribute attr={movie.rated} />
                 <MovieAttribute attr={movie.awards} />
+                <BodyCountInput movie={movie}/>
                 {img}
             </div>
         )
@@ -85,17 +118,14 @@ const MovieContent = React.createClass({
 		})
 	},
 	getInitialState() {
-		return {movie: {
-            title: 'No movie searched yet'
-        }}
+		return {}
 	},
 	render() {
 		const {movie} = this.state
-        const {title} = movie
+        const elem = movie ? <MovieInfo movie={movie} /> : null 
 		return (
             <div>
-                <h2>{title}</h2>
-                <MovieInfo movie={movie} />
+                {elem}
             </div>
         )
 	}
@@ -115,8 +145,8 @@ ReactDOM.render(
 	<div>
         <h3>Search for a movie</h3>
         <MyInput />
-		<MovieContent headerStream={subscribe('.movie')}/>
         <MovieListing moviesStream={subscribe('.movies')}/>
+		<MovieContent headerStream={subscribe('.movie')}/>
 	</div>,
 	document.getElementById('app')
 )
