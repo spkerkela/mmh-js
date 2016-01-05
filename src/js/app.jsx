@@ -3,6 +3,22 @@ const ReactDOM = require('react-dom')
 const B = require('baconjs')
 const {subscribe, dispatch} = require('./worker-stream')
 
+const MovieListing = React.createClass({
+    render() {
+        const {dbMovies} = this.props
+        
+        const movieElems = dbMovies.map((movie) => {
+            return <li>{movie.Title}</li>
+        })
+        
+        return (
+            <ul>
+                {movieElems}
+            </ul>
+        )
+    }
+})
+
 const MovieInfo = React.createClass({
     render() {
         const {movie} = this.props
