@@ -1,13 +1,14 @@
 /* global fetch */
 const B = require('baconjs')
 const PouchDB = require('pouchdb')
+const R = require('ramda')
 
 const localDB = new PouchDB('movies')
 const remoteCouch = 'http://localhost:5984/movies'
 
 function insertMovie(movie) {
     localDB.put(movie, (err, result) => {
-        if(!err) {
+        if (!err) {
             postMessage({ movie: movie })
         }
     })
@@ -35,13 +36,31 @@ const movieSearch = messageStream
     })
     .filter(resp => resp.Response !== 'False')
     .map(movie => {
-       movie._id = movie.imdbID 
-       return movie 
+        movie._id = movie.imdbID
+        return movie
     }).log()
-    
+
 const dbUpdates = B.fromEvent(localDB.changes({
     since: 'now',
     live: true
-}), 'change').log('db updates')
+}), 'change')
 
 movieSearch.onValue(movie => insertMovie(movie))
+dbUpdates
+    .flatMap(changes => {
+        return B.fromNodeCallback(localDB.allDocs.bind(localDB), {
+            include_docs: true,
+            descending: true
+        })
+    })
+    .map('.rows')
+    .onValue(movies => {
+        postMessage({movies: movies})
+    })
+
+
+/*
+B.fromNodeCallback(localDB.allDocs.bind(this), {
+    include_docs: true,
+    descending: true
+}).log()*/
