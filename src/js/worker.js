@@ -1,5 +1,6 @@
 /* global fetch */
 const B = require('baconjs')
+const db = require('pouchdb')
 
 const messageStream = B.fromBinder(sink => {
     onmessage = (e) => {
