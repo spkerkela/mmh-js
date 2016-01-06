@@ -32,7 +32,13 @@ function documentFromMovie(movie) {
         if (value === 'N/A') {
             return movieAcc
         }
-        const val = R.contains(key, ['Country', 'Director', 'Actors', 'Genre', 'Language', 'Writer']) ? arrayFromString(value) : value
+        const arrayLikes = ['Country',
+                            'Director',
+                            'Actors',
+                            'Genre',
+                            'Language',
+                            'Writer']
+        const val = R.contains(key, arrayLikes) ? arrayFromString(value) : value
         return R.assoc(key.toLowerCase(), val, movieAcc)
     }, {}, pairs)
     return R.dissoc('response', movieDocument)
@@ -94,13 +100,13 @@ dbUpdates
         postMessage({ movies })
     })
 
-B.fromNodeCallback(localDB.allDocs.bind(localDB), { include_docs: true, descending: true })
+B.fromNodeCallback(localDB.allDocs.bind(localDB),
+                   { include_docs: true, descending: true })
     .map('.rows')
     .map(moviesList => moviesList.map(m => m.doc))
     .onValue(movies => {
         postMessage({ movies })
     })
-
 function sync() {
     const opts = { live: true }
     localDB.replicate.to(remoteCouch, opts)
