@@ -5,23 +5,37 @@ const {subscribe, dispatch} = require('./worker-stream')
 const R = require('ramda')
 
 const BodyCountInput = React.createClass({
+    componentDidMount() {
+      const bodyCountStream = subscribe('.movie')
+        .map('.movie')
+        .map(movie => (movie.bodyCount || 0))
+      
+      	const stateUpdate = B.combineTemplate({
+			bodyCount: bodyCountStream
+		})
+		
+		stateUpdate.onValue(newState => {
+			this.setState(newState)
+		})
+        
+    },
     getInitialState() {
-        const bodyCount = this.props.movie.bodyCount || 0
         return {
-            bodyCount: bodyCount
+            bodyCount: 0
         }
     },
     updateBodyCount(e) {        
-        this.setState({bodyCount: e.target.value})
+        this.setState({bodyCount: parseInt(e.target.value)})
     },
     saveMovie() {
         const {movie} = this.props
         const {bodyCount} = this.state
-        movie.bodyCount = parseInt(bodyCount)
+        movie.bodyCount = parseInt(bodyCount) || 0
         dispatch({action: 'saveMovie', value: movie})
     },
     render() {
         const {bodyCount} = this.state
+
         return (
             <div>
                 <input type={'number'} step={1} min={0} value={bodyCount} onChange={this.updateBodyCount}/>
