@@ -7,21 +7,17 @@ const R = require('ramda')
 const BodyCountInput = React.createClass({
     getInitialState() {
         const bodyCount = this.props.movie.bodyCount || 0
-        
         return {
-            bodyCount: 0
+            bodyCount: bodyCount
         }
     },
-    updateBodyCount(e) {
-        const bodyCount = e.target.value
-        
-        this.setState({bodyCount: parseInt(bodyCount) || 0})
+    updateBodyCount(e) {        
+        this.setState({bodyCount: e.target.value})
     },
     saveMovie() {
         const {movie} = this.props
         const {bodyCount} = this.state
-        console.log('saving movie')
-        movie.bodyCount = bodyCount
+        movie.bodyCount = parseInt(bodyCount)
         dispatch({action: 'saveMovie', value: movie})
     },
     render() {
@@ -98,6 +94,7 @@ const MovieInfo = React.createClass({
                 <MovieAttribute attr={movie.year} />
                 <MovieAttribute attr={movie.rated} />
                 <MovieAttribute attr={movie.awards} />
+                <MovieAttribute attr={movie.bodyCount} />
                 <BodyCountInput movie={movie}/>
                 {img}
             </div>
