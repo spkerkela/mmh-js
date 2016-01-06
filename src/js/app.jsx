@@ -103,6 +103,7 @@ const MovieInfo = React.createClass({
                 <h2>{movie.title}</h2>
                 <p>{movie.plot}</p>
                 <MovieAttribute attr={movie.actors} />
+                <MovieAttribute attr={movie.type} />
                 <MovieAttribute attr={movie.runtime} />
                 <MovieAttribute attr={movie.writer} />
                 <MovieAttribute attr={movie.year} />
