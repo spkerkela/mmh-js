@@ -1,4 +1,5 @@
 const React = require('react')
+const {dispatch} = require('../worker-stream')
 
 export const MovieSearch = React.createClass({
     myChange(e) {

@@ -21,9 +21,11 @@
   },
   "dependencies": {
     "baconjs": "^0.7.83",
+    "history": "^1.17.0",
     "pouchdb": "^5.1.0",
     "ramda": "^0.19.1",
     "react": "^0.14.3",
-    "react-dom": "^0.14.3"
+    "react-dom": "^0.14.3",
+    "react-router": "^1.0.3"
   }
 }

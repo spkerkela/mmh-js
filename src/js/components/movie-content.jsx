@@ -1,6 +1,7 @@
 const React = require('react')
 const R = require('ramda')
 const B = require('baconjs')
+const {subscribe, dispatch} = require('../worker-stream')
 
 const BodyCountInput = React.createClass({
     componentDidMount() {
