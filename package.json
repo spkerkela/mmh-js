@@ -20,7 +20,7 @@
     "worker-loader": "^3.0.8"
   },
   "dependencies": {
-    "baconjs": "^0.7.83",
+    "baconjs": "^3.0.0",
     "history": "^1.17.0",
     "pouchdb": "7.3.1",
     "ramda": "^0.28.0",
