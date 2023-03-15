@@ -16,7 +16,7 @@
     "copy-webpack-plugin": "11.0.0",
     "css-loader": "6.7.3",
     "style-loader": "^3.0.0",
-    "webpack": "5.76.1",
+    "webpack": "5.76.2",
     "worker-loader": "^3.0.8"
   },
   "dependencies": {
